@@ -26,58 +26,38 @@ def getting_soup_object_for_scrapping(url):
     return soup
 
 
-
 def creating_file_with_jobs(soup):
-    # below part is about extracting all information from webpage
-    partial_class_title = "vacancy-item__title"  # here we are defining classes that we want to seach for
-    partial_class_salary = "vacancy-item__salary-label"
-    desired_class_company = "vacancy-item__body"
-    desired_class_locations = "vacancy-item__locations"
-    desired_class_expiration = "vacancy-item__info-secondary"
-    desired_class_job_link = "vacancy-item"
+    job_title_list = []
+    job_locations_list = []
+    job_expiration_list = []
+    job_salary_list = []
+    employer_list = []
+    job_link_list = []
+    class_to_find = "vacancy-item"
+    found_elements = soup.find_all('a', class_=class_to_find)
+    for element in found_elements:
+        job_title = element.find(class_='vacancy-item__title')
+        job_title_list.append(job_title.get_text())
+        job_location = element.find(class_='vacancy-item__locations')
+        job_locations_list.append(job_location.get_text())
+        job_expiration = element.find(class_='vacancy-item__expiry')
+        job_expiration_list.append(job_expiration.get_text())
+        try:
+            job_salary = element.find(class_='vacancy-item__salary-label')
+            job_salary_list.append(job_salary.get_text())
+        except:
+            job_salary_list.append('no salary')
+        employer = element.find(class_='vacancy-item__body')
+        employer_list.append(employer.get_text())
+        href = element.get('href')
+        job_link = 'cv.lv' + href
+        job_link_list.append(job_link)
 
-    elements_job_title = soup.find_all('span', class_=lambda value: value and partial_class_title in value)  # <span class="jsx-3024910437 vacancy-item__title">Loģistikas asistents/-e</span> -> value = jsx-3024910437 vacancy-item__title; and we check if inside of value there is string that we want to find
-    list_of_job_titles = []  # this part is extracting everythin with the classes from above and creating empty lists for each column
-    elements_job_salary = soup.find_all('span', class_=lambda value: value and partial_class_salary in value)
-    list_of_job_salary = []
-    elements_companies_div = soup.find_all('div', class_=desired_class_company)
-    list_of_companies = []
-    elements_locations = soup.find_all('div', class_=desired_class_locations)
-    list_of_locations = []
-    elements_expiration = soup.find_all('div', class_=desired_class_expiration)
-    list_of_expirations = []
-    elements_job_link = soup.find_all('a', class_=desired_class_job_link)
-    list_of_job_links = []
+    matrix = [[title, salary, company, location, expiration, link] for title, salary, company, location, expiration,
+                                                                       link in
+              zip(job_title_list, job_salary_list, employer_list, job_locations_list, job_expiration_list,
+                  job_link_list)]
 
-    for job_title in elements_job_title:  # here we are populating lists created in the previous step
-        list_of_job_titles.append(job_title.text)
-
-    for job_salary in elements_job_salary:
-        list_of_job_salary.append(job_salary.text)
-
-    for element in elements_companies_div:
-        name = element.find('a')
-        list_of_companies.append(name.text)
-
-    for location in elements_locations:
-        list_of_locations.append(location.text)
-
-    for expiration in elements_expiration:
-        name = expiration.find("span", class_='vacancy-item__expiry')
-        list_of_expirations.append(name.text)
-
-    for job_link in elements_job_link:
-        name = "cv.lv" + job_link.get("href")
-        list_of_job_links.append(name)
-
-    # below part is for creating matrix out of lists from the above part
-    # Using list comprehension to create a matrix
-    matrix = [[title, salary, company, location, expiration, link] for
-              title, salary, company, location, expiration, link in
-              zip(list_of_job_titles, list_of_job_salary, list_of_companies, list_of_locations, list_of_expirations,
-                  list_of_job_links)]
-
-    # below part is transforming our matrix into pandas dataframe and renames indexes to columns
     df = pd.DataFrame(matrix)
     new_column_names = ['Job Title', 'Salary', 'Company', 'Location', 'Expiration Date', 'URL']
     df.columns = new_column_names
