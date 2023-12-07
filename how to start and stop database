@@ -1,0 +1,12 @@
+w:
+cd W:\Coding\PostgreSQL\16\bin
+pg_ctl start -D "W:\Coding\PostgreSQL\16\data"
+pg_ctl stop -D "W:\Coding\PostgreSQL\16\data"
+
+ipconfig #to check ip address of windows machine
+pg_isready -h 192.168.0.40 -p 5432 #to check if specific ip is accepting connections
+ping 192.168.0.40 #to check if ip is available
+pg_ctl status -D "W:\Coding\PostgreSQL\16\data" #check if sql server is running on the machine
+pg_ctl reload -D "W:\Coding\PostgreSQL\16\data" #Reload database
+
+Test-NetConnection -ComputerName 46.109.66.204 -Port 5432 #powershell to check if specific port is accepting connections
