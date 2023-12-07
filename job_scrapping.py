@@ -47,7 +47,7 @@ def creating_file_with_jobs(soup):
             job_salary_list.append(job_salary.get_text())
         except:
             job_salary_list.append('no salary')
-        employer = element.find(class_='vacancy-item__body')
+        employer = element.find(class_='vacancy-item__column')
         employer_list.append(employer.get_text())
         href = element.get('href')
         job_link = 'cv.lv' + href
@@ -82,6 +82,7 @@ soup_for_final_table = getting_soup_object_for_scrapping(url_for_scrapping)
 df = creating_file_with_jobs(soup_for_final_table)
 # write_output_to_excel(df)
 write_output_to_postgresql(df)
+print('job vacancies are written to the database')
 
 
 
