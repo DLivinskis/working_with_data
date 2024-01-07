@@ -68,11 +68,9 @@ def creating_file_with_jobs(soup):
 def write_output_to_excel(df):
     df.to_excel('jobs.xlsx', index=False)
 
-def write_output_to_postgresql(df):
+def write_output_to_postgresql(df,table_name):
     db_url = "postgresql://dmitrijsl:020399@localhost:5432/scrapping_storage"
     engine = create_engine(db_url)
-    table_name = 'jobs'
-
     df.to_sql(table_name, engine, if_exists='append', index=False)
 
 soup_for_number_of_jobs = getting_soup_object_for_scrapping(url)
@@ -81,7 +79,8 @@ url_for_scrapping = f"https://cv.lv/lv/search?limit={number_of_jobs}&offset=0&fu
 soup_for_final_table = getting_soup_object_for_scrapping(url_for_scrapping)
 df = creating_file_with_jobs(soup_for_final_table)
 # write_output_to_excel(df)
-write_output_to_postgresql(df)
+table_name = 'jobs'
+write_output_to_postgresql(df,table_name)
 print('job vacancies are written to the database')
 
 
