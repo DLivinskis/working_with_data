@@ -70,7 +70,7 @@ def write_output_to_excel(df):
     df.to_excel('jobs.xlsx', index=False)
 
 def write_output_to_postgresql(df,table_name):
-    with open('data.json') as f:
+    with open(r'W:\Coding\PythonProjects\Main_Python_Project\link_to_db.json') as f:
         # Load JSON data
         data = json.load(f)
     db_url = data['link_to_db']
