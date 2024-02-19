@@ -4,6 +4,7 @@ import re
 import pandas as pd
 from datetime import datetime
 from sqlalchemy import create_engine
+import json
 import psycopg2
 
 url = "https://cv.lv/lv/search?limit=20&offset=0&fuzzy=true&suitableForRefugees=false&isHourlySalary=false&isRemoteWork=false&isQuickApply=false"
@@ -69,7 +70,10 @@ def write_output_to_excel(df):
     df.to_excel('jobs.xlsx', index=False)
 
 def write_output_to_postgresql(df,table_name):
-    db_url = "postgresql://dmitrijsl:020399@localhost:5432/scrapping_storage"
+    with open('data.json') as f:
+        # Load JSON data
+        data = json.load(f)
+    db_url = data['link_to_db']
     engine = create_engine(db_url)
     df.to_sql(table_name, engine, if_exists='append', index=False)
 
@@ -79,6 +83,7 @@ url_for_scrapping = f"https://cv.lv/lv/search?limit={number_of_jobs}&offset=0&fu
 soup_for_final_table = getting_soup_object_for_scrapping(url_for_scrapping)
 df = creating_file_with_jobs(soup_for_final_table)
 # write_output_to_excel(df)
+
 table_name = 'jobs'
 write_output_to_postgresql(df,table_name)
 print('job vacancies are written to the database')
