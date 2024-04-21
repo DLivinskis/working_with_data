@@ -10,14 +10,13 @@ import psycopg2
 url = "https://cv.lv/lv/search?limit=20&offset=0&fuzzy=true&suitableForRefugees=false&isHourlySalary=false&isRemoteWork=false&isQuickApply=false"
 def find_number_of_jobs(soup):
     numbers = [] #Create an empty list as otherwise function does not work
-    specific_text = "Meklēšanas rezultāti" #part of the text that I want to find inside of span; typically full value looks like this: "Meklēšanas rezultāti (2275):"
-    spans = soup.find_all('span') #find all span elements
+    specific_text = "search-results-heading__value" #part of the text that I want to find inside of span; typically full value looks like this: "Meklēšanas rezultāti (2275):"
+    spans = soup.find_all('span',class_='search-results-heading__value') #find all span elements
     for span in spans: # iterate through all span elements
-        if specific_text in span.text: # if inside of a span element there is text from variable specific_text execute the below code
+            # print(span.text)
             number = re.findall(r'\d+\.\d+|\d+', span.text) #extract numbers out of the span element
-            numbers += number #add to the list the result
-            number_to_return = numbers[0] #return first object from the list; For some reason there werew 2 identical span elements, so I am taking the first one
-    return number_to_return
+            print(type(number))
+    return number[0]
 
 
 def getting_soup_object_for_scrapping(url):
