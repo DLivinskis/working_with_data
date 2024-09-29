@@ -33,8 +33,8 @@ def creating_file_with_jobs(soup):
     job_salary_list = []
     employer_list = []
     job_link_list = []
-    class_to_find = "vacancy-item"
-    found_elements = soup.find_all('a', class_=class_to_find)
+    found_elements = soup.find_all('ul')
+    found_elements = found_elements[1].find_all('li')
     for element in found_elements:
         job_title = element.find(class_='vacancy-item__title')
         job_title_list.append(job_title.get_text())
@@ -43,24 +43,29 @@ def creating_file_with_jobs(soup):
         job_expiration = element.find(class_='vacancy-item__expiry')
         job_expiration_list.append(job_expiration.get_text())
         try:
-            job_salary = element.find(class_='vacancy-item__salary-label')
+            job_salary = element.find(class_='salary-label')
             job_salary_list.append(job_salary.get_text())
         except:
             job_salary_list.append('no salary')
         employer = element.find(class_='vacancy-item__column')
         employer_list.append(employer.get_text())
-        href = element.get('href')
+        href = element.find('a')
+        href = href.get('href')
         job_link = 'cv.lv' + href
         job_link_list.append(job_link)
 
-    matrix = [[title, salary, company, location, expiration, link] for title, salary, company, location, expiration,
-                                                                       link in
-              zip(job_title_list, job_salary_list, employer_list, job_locations_list, job_expiration_list,
-                  job_link_list)]
+    multi_level_list = zip(job_title_list,
+                           job_salary_list, employer_list,
+                           job_locations_list,
+                           job_expiration_list,
+                           job_link_list)
 
-    df = pd.DataFrame(matrix)
-    new_column_names = ['Job Title', 'Salary', 'Company', 'Location', 'Expiration Date', 'URL']
-    df.columns = new_column_names
+    df = pd.DataFrame(multi_level_list, columns=["Job Title",
+                                                 "Salary",
+                                                 "Company",
+                                                 "Location",
+                                                 "Expiration Date",
+                                                 "URL"])
     current_timestamp = datetime.now()
     df['snapshot_date'] = current_timestamp
     return df
